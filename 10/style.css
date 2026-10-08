@@ -6,3 +6,15 @@ body{background:var(--bg)}button,input,select{font-family:inherit}h1,h2,h3{font-
 
 /* Keep solo and squad selection usable on small screens. */
 .team-count{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.team-count .choice{padding:8px}.solo-input{grid-template-columns:1fr}.solo-input .team-entry{max-width:420px}@media(min-width:681px) and (max-width:1000px),(max-width:400px){.team-count{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Arcade challenges share the same keyboard and touch controls. */
+.mode-badge{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-weight:850;font-size:1.125rem;margin-bottom:8px}
+.translation-candidate{font-size:clamp(1.25rem,3vw,2rem);text-align:center;padding:24px;background:var(--bg);border:2px dashed var(--line);border-radius:12px;margin-bottom:24px;overflow-wrap:anywhere}
+.truth-answers .answer{justify-content:center}.truth-answers .answer>span{font-size:2rem}
+.scramble-board{padding:20px;background:var(--bg);border:2px dashed var(--accent);border-radius:12px;margin-bottom:24px}
+.scrambled-letters{font:800 clamp(1.25rem,3vw,2rem)/1.7 monospace;color:var(--accent);margin-top:8px;overflow-wrap:anywhere;white-space:pre-wrap}
+.pair-instructions{max-width:65ch}.pair-progress{color:var(--accent);font:700 1rem monospace;margin:16px 0}
+.pair-board{display:grid;grid-template-columns:1fr 1fr;gap:20px}.pair-column{display:flex;flex-direction:column;gap:12px;min-width:0}.pair-column h2{font-size:1rem;color:var(--muted);margin-bottom:4px}
+.pair-tile{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:1;width:100%;min-height:80px;text-align:left;padding:16px;border:2px solid var(--line);border-radius:10px;background:oklch(.29 .07 250);color:var(--ink);font-size:1.125rem;font-weight:750;overflow-wrap:anywhere}
+.pair-column:last-child .pair-tile{background:oklch(.29 .07 355)}.pair-tile[aria-pressed=true]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}.pair-tile:hover:not(:disabled){border-color:var(--ink)}.pair-tile.pair-matched{background:var(--green-soft);border-color:var(--green);color:var(--green)}.pair-tile.pair-wrong{border-color:var(--red)}.pair-mark{flex-shrink:0}
+@media(max-width:680px){.pair-board{gap:12px}.pair-tile{padding:12px 8px;font-size:.9375rem;min-height:88px}.mode-badge{font-size:1rem}.scramble-board{padding:16px}.translation-candidate{padding:16px}.question-meta{align-items:flex-start}}

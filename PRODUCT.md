@@ -27,3 +27,8 @@ Keine Schul- oder Arbeitsblattoptik, keine Werbe-Landingpage, keine Kleinkind-Mo
 
 ## Accessibility & Inclusion
 Tastaturbedienung, große Schaltflächen, verständliche Statusmeldungen, Kontrast und reduzierte Bewegung. Zeitlimit abschaltbar.
+
+## Game Modes
+Arcade Mix is the default: Quiz, Type Attack, True or False, Word Scramble and Pair Match. A shuffled five-mode cycle is shared by all teams; mixed runs have at least five challenges per player/team. Individual modes remain selectable. Translation direction defaults to alternating German → English and English → German, shared by teams each round. Pair Match always shows both languages. Pair Match awards the normal challenge score after all pairs are matched; a wrong pair ends the challenge and unmatched words enter the review pool.
+
+All three vocabulary missions (all 100 words) are selected by default.
