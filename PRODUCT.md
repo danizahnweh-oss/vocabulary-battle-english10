@@ -11,10 +11,10 @@ Englischklasse der Jahrgangsstufe 10; gemeinsame Nutzung am Beamer, Bedienung du
 Vokabeln der bereitgestellten Seiten in einem Teamwettbewerb mit Zeitlimit und Punkten üben. Vom Nutzer bestätigt: gemeinsames Spielen in der Klasse und wettbewerbsorientierte Gestaltung.
 
 ## Brand Personality
-Klar, lebendig, sportlich. Deutsche Bedienung, englische Vokabeln.
+Deutlich verspielt, bunt, wettbewerbsorientiert. Auf ausdrücklichen Nutzerwunsch Computerspiel statt Schuloptik: dunkle Arcade-Lobby, Neonakzente, Team-Avatare, XP, Level-Fortschritt und Pokalfeier. Deutsche Bedienung, englische Vokabeln.
 
 ## Anti-references
-Keine Werbe-Landingpage, keine verspielten Kleinkind-Motive, keine überladene Spieloberfläche.
+Keine Schul- oder Arbeitsblattoptik, keine Werbe-Landingpage, keine Kleinkind-Motive.
 
 ## Design Principles
 - Gleiche Anzahl Fragen für jedes Team.
