@@ -31,10 +31,14 @@ Tastaturbedienung, große Schaltflächen, verständliche Statusmeldungen, Kontra
 ## Game Modes
 Arcade Mix is the default: Quiz, Type Attack, True or False, Word Scramble and Pair Match. A shuffled five-mode cycle is shared by all teams; mixed runs have at least five challenges per player/team. Individual modes remain selectable. Translation direction defaults to alternating German → English and English → German, shared by teams each round. Pair Match always shows both languages. Pair Match awards the normal challenge score after all pairs are matched; a wrong pair ends the challenge and unmatched words enter the review pool.
 
-All three vocabulary missions (all 100 words) are selected by default.
+All vocabulary missions for the selected grade are enabled by default.
 
 ## Routes and Vocabulary
 - `/10/`: 100 words, Across cultures and Scottish history.
-- `/7/`: 49 complete headwords from the three Unit 1 “Find your place” photos: 21 Check-in entries (page 183 and first two entries on page 184), 28 Station 1 entries (page 184 and the supplied part of page 185). Cropped Station 2 entries are not guessed.
+- `/7/`: 959 distinct vocabulary entries from the supplied photos and 19 screenshots (pages 182–219), covering Units 1–4, Across cultures 1–3, Focus 1–2, Text smart 1–2 and supplementary word banks. The original 49 entries and IDs are retained. Main entries follow the printed meanings; missing German meanings in the word banks are supplemented and labeled. Different senses of an English headword are explicitly labeled, such as “body (a dead person)” and “for (reason)”.
+- Reviewed additions live in `7/data/additions.tsv`; run `node scripts/build-grade7-vocabulary.cjs` from the repo root to regenerate `7/vocabulary-additions.js`. All 12 missions are enabled by default.
 - Both routes use `shared/app.js` and `shared/style.css`; vocabulary, accepted variants and mission metadata stay in their own grade folder. Word counts are calculated from each dataset.
 - New vocabulary belongs to the requested grade. Each grade defaults to all its missions, all five game modes and both directions.
+
+## Flashcards and Mistake Practice
+Flashcards use the selected missions, with saved mistakes first. Mistake IDs are saved locally per grade. Every incorrect game answer enters the mistake list. A game with mistakes opens mandatory recall practice before its results: every missed word needs two correct recalls (one in each language when directions are mixed). Incorrect recalls return to the queue. Revealed answers must be hidden before recall can be checked. Leaving saves pending mistakes; the lobby provides “Practise mistakes”. Both grades share this feature.

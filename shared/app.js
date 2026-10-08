@@ -28,7 +28,7 @@ function renderSetup(){
   <section class="section" aria-labelledby="teams-title"><div class="section-title"><span class="step" aria-hidden="true">01</span><h2 id="teams-title">Solo or squad?</h2></div><div class="team-count" role="group" aria-label="Players and teams">${[1,2,3,4].map(n=>`<button class="choice" type="button" data-count="${n}" aria-pressed="${setup.count===n}">${n===1?'Solo':n+' Teams'}</button>`).join('')}</div><div class="team-inputs ${isSolo()?'solo-input':''}">${Array.from({length:setup.count},(_,i)=>`<div class="team-entry team-color-${i}"><label for="team-${i}"><span class="team-avatar" aria-hidden="true">${TEAM_ICONS[i]}</span> ${isSolo()?'Player name':'Team '+(i+1)}</label><input id="team-${i}" name="team-${i}" maxlength="24" value="${escapeHTML(isSolo()?setup.soloName:setup.names[i])}" autocomplete="off" required></div>`).join('')}</div></section>
   <section class="section" aria-labelledby="topics-title"><div class="section-title"><span class="step" aria-hidden="true">02</span><h2 id="topics-title">Choose your mission</h2></div>
   ${MISSIONS.map(({id,title,sub,icon,groups})=>`<label class="topic topic-${id}"><span class="topic-icon" aria-hidden="true">${icon}</span><input type="checkbox" name="topic" value="${id}" ${setup.topics.includes(id)?'checked':''}><span class="topic-copy"><strong lang="en">${escapeHTML(title)}</strong><span>${escapeHTML(sub)}</span></span><span class="word-count">${VOCAB.filter(w=>groups.includes(w.group)).length} words</span></label>`).join('')}
-  <p class="hint" id="selection-count"></p></section>
+  <p class="hint" id="selection-count"></p><div class="actions"><button type="button" class="secondary" id="flashcards-start">🃏 Flashcards</button>${pendingMistakes.size?'<button type="button" class="quiet" id="mistakes-start">Practise mistakes</button>':''}</div><p class="hint">${flashcardHint()}</p></section>
   </div><aside class="rules" aria-labelledby="rules-title"><h2 id="rules-title"><span aria-hidden="true">🎮</span> Match setup</h2>
   <div class="field"><label for="mode">Game mode</label><select id="mode"><option value="mix">Arcade Mix · All 5 games</option>${Object.entries(MODES).map(([id,m])=>`<option value="${id}">${m.name}</option>`).join('')}</select><p class="hint" id="mode-description"></p></div>
   <div class="field" id="direction-field"><label for="direction">Translation direction</label><select id="direction"><option value="mixed">Mixed · Both directions</option><option value="de-en">German → English</option><option value="en-de">English → German</option></select></div>
@@ -40,6 +40,8 @@ function renderSetup(){
   main.querySelectorAll('[data-count]').forEach(b=>b.addEventListener('click',()=>{readSetup();setup.count=Number(b.dataset.count);renderSetup();main.querySelector(`[data-count="${setup.count}"]`).focus();}));
   $('#setup-form').addEventListener('change',()=>{readSetup();updateSetupSummary();});
   $('#setup-form').addEventListener('submit',e=>{e.preventDefault();readSetup();if(!selectedWords().length){$('#setup-error').textContent='Choose at least one mission.';return;}if(new Set(playerNames().map(normalise)).size!==setup.count){$('#setup-error').textContent='Give each team a different name.';return;}startGame();});
+  $('#flashcards-start').onclick=()=>{readSetup();startFlashcards(selectedWords());};
+  if($('#mistakes-start'))$('#mistakes-start').onclick=()=>{readSetup();startFlashcards(VOCAB.filter(w=>pendingMistakes.has(w.id)));};
   updateSetupSummary();
 }
 function readSetup(){
@@ -65,7 +67,7 @@ function startGame(pool=selectedWords()){
   let modes=[];while(modes.length<setup.rounds)modes.push(...(setup.mode==='mix'?shuffle(Object.keys(MODES)):[setup.mode]));
   const firstDirection=Math.random()<.5?'de-en':'en-de';
   const directions=Array.from({length:setup.rounds},(_,i)=>setup.direction==='mixed'?(i%2?(firstDirection==='de-en'?'en-de':'de-en'):firstDirection):setup.direction);
-  game={modes,directions,teams:playerNames().map((name,index)=>({name,index,score:0,correct:0})),pool,deck:deck.slice(0,setup.count*setup.rounds),turn:0,phase:'ready',missed:[],current:null};
+  game={modes,directions,teams:playerNames().map((name,index)=>({name,index,score:0,correct:0})),pool,deck:deck.slice(0,setup.count*setup.rounds),turn:0,phase:'ready',missed:[],current:null,practiceComplete:false};
   $('#word-list').disabled=true;renderReady();
 }
 function activeTeam(){return game.teams[game.turn%game.teams.length];}
@@ -86,7 +88,7 @@ function makeChoices(word,lang){
   return shuffle(choices);
 }
 function puzzleAnswer(word,lang){
-  if(lang==='en')return (word.en==='(song) lyrics'?'song lyrics':word.en.split(' / ')[0]).replace(/^to /,'');
+  if(lang==='en')return word.puzzleEn||(word.en==='(song) lyrics'?'song lyrics':word.en.split(' / ')[0]).replace(/^to /,'');
   return word.de.split(';')[0].split(' / ')[0].replace(/\s*\([^)]*\)/g,'').trim();
 }
 function scrambleText(text){
@@ -161,7 +163,7 @@ function submitAnswer(value){
   stopTimer();game.phase='feedback';
   const correct=value!==null&&(c.mode==='choice'?c.choices[value]?.correct:c.mode==='truth'?value===c.truth:c.mode==='pairs'?value===true:answerVariants(c.word,c.target).includes(normalise(value))||(c.mode==='scramble'&&normalise(value)===normalise(c.puzzle)));
   const bonus=correct&&setup.seconds?Math.min(50,Math.ceil(50*remaining/(setup.seconds*1000))):0;
-  if(correct){activeTeam().score+=100+bonus;activeTeam().correct++;}else game.missed.push(...(c.mode==='pairs'?c.pairs.filter(w=>!c.matched.includes(w.id)):[c.word]));
+  if(correct){activeTeam().score+=100+bonus;activeTeam().correct++;}else {const missed=c.mode==='pairs'?c.pairs.filter(w=>!c.matched.includes(w.id)):[c.word];game.missed.push(...missed);rememberMistakes(missed);}
   if(c.mode==='choice')main.querySelectorAll('[data-answer]').forEach(b=>{b.disabled=true;const index=Number(b.dataset.answer);if(c.choices[index].correct){b.classList.add('correct');b.querySelector('.key').textContent='✓';}else if(index===value){b.classList.add('wrong');b.querySelector('.key').textContent='×';}});
   else if(c.mode==='truth')main.querySelectorAll('[data-truth]').forEach(b=>{b.disabled=true;b.classList.add((b.dataset.truth==='true')===c.truth?'correct':'wrong');});
   else if(c.mode==='pairs')main.querySelectorAll('[data-pair]').forEach(b=>b.disabled=true);
@@ -175,6 +177,7 @@ function submitAnswer(value){
   $('#next').focus({preventScroll:true});
 }
 function renderResults(){
+  if(game.missed.length&&!game.practiceComplete){startFlashcards(game.missed,true);return;}
   stopTimer();game.phase='results';$('#word-list').disabled=false;
   const sorted=[...game.teams].sort((a,b)=>b.score-a.score);const top=sorted[0].score;
   const winners=sorted.filter(t=>t.score===top);const missed=[...new Map(game.missed.map(w=>[w.id,w])).values()];
@@ -205,9 +208,10 @@ $('#confirm-quit').addEventListener('click',()=>{$('#quit-dialog').close();rende
 $('#fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{announce('Full screen is not available in this browser.');$('#fullscreen').textContent='Full screen unavailable';}});
 if(!document.documentElement.requestFullscreen)$('#fullscreen').hidden=true;
 document.addEventListener('fullscreenchange',()=>{$('#fullscreen').textContent=document.fullscreenElement?'Exit full screen':'Full screen';});
-document.addEventListener('invalid',e=>{if(e.target.matches('input[required]'))e.target.setCustomValidity(e.target.id==='typed-answer'?`Enter a translation in ${game?.current?.target==='de'?'German':'English'}.`:isSolo()?'Enter your player name.':'Enter a team name.');},true);
+document.addEventListener('invalid',e=>{if(e.target.matches('input[required]'))e.target.setCustomValidity(['typed-answer','card-answer'].includes(e.target.id)?'Enter a translation.':isSolo()?'Enter your player name.':'Enter a team name.');},true);
 document.addEventListener('input',e=>{if(e.target.matches('input[required]'))e.target.setCustomValidity('');});
 document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||document.querySelector('dialog[open]')||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(game?.phase==='question'&&game.current.mode==='choice'&&/^[1-4]$/.test(e.key)){e.preventDefault();submitAnswer(Number(e.key)-1);}});
 $('#vocab-total').textContent=`${VOCAB.length} words · ${Object.keys(MODES).length} game modes`;
 $('#word-log-intro').textContent=`All ${VOCAB.length} words for English ${GRADE}. ${VOCAB_NOTE}`;
+loadMistakes();
 renderSetup();

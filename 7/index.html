@@ -4,20 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#131318">
-<meta name="description" content="An arcade vocabulary battle for solo players and teams: English 7, Unit 1: Find your place.">
+<meta name="description" content="An arcade vocabulary battle for solo players and teams: English 7, Units 1–4, Across cultures, Focus and Text smart.">
 <title>Vocabulary Battle · English 7</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%239b2055'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='40' font-family='sans-serif' font-weight='bold' fill='white'%3EV%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="../shared/style.css?v=grades-1">
-<script src="vocabulary.js?v=grades-1" defer></script>
-<script src="../shared/app.js?v=grades-1" defer></script>
+<link rel="stylesheet" href="../shared/style.css?v=cards-1">
+<script src="vocabulary-additions.js?v=expanded-1" defer></script>
+<script src="vocabulary.js?v=expanded-1" defer></script>
+<script src="../shared/flashcards.js?v=cards-1" defer></script>
+<script src="../shared/app.js?v=cards-1" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to game</a>
 <header class="header"><a class="brand" href="./" aria-label="Vocabulary Battle home"><span class="brand-mark" aria-hidden="true">V<span>★</span></span><span>Vocabulary <b>Battle</b></span></a><div class="header-right"><span class="course">English 7 · Solo + multiplayer</span><button class="quiet" id="word-list">Word log</button><button class="quiet" id="fullscreen">Full screen</button></div></header>
 <main id="main" tabindex="-1"></main>
-<footer><span id="vocab-total">49 words · 5 game modes</span><span>Ready. Set. Battle.</span></footer>
+<footer><span id="vocab-total">959 words · 5 game modes</span><span>Ready. Set. Battle.</span></footer>
 <div class="sr-only" id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
-<dialog id="words-dialog" aria-labelledby="words-heading"><div class="dialog-head"><h2 id="words-heading">Word log</h2><button class="quiet" id="close-words">Close</button></div><p id="word-log-intro">All 49 words for your missions. Unit 1: Find your place.</p><label for="word-search">Find a word</label><input id="word-search" type="search" placeholder="English or German"><div id="words-content"></div></dialog>
+<dialog id="words-dialog" aria-labelledby="words-heading"><div class="dialog-head"><h2 id="words-heading">Word log</h2><button class="quiet" id="close-words">Close</button></div><p id="word-log-intro">All 959 words for your missions. Units 1–4, Across cultures, Focus and Text smart.</p><label for="word-search">Find a word</label><input id="word-search" type="search" placeholder="English or German"><div id="words-content"></div></dialog>
 <dialog id="quit-dialog" aria-labelledby="quit-heading"><h2 id="quit-heading">End this match?</h2><p>Your current scores will be lost.</p><div class="actions"><button class="secondary" id="keep-playing">Keep playing</button><button class="primary" id="confirm-quit">End match</button></div></dialog>
 <noscript>Please enable JavaScript to play Vocabulary Battle.</noscript>
 </body>
