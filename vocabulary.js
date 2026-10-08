@@ -8,7 +8,7 @@ const GROUPS = {
 const RAW_VOCAB = {
   cultures: [
     ['rainbow','Regenbogen'],
-    ['LGBTQIA+','Abkürzung für lesbisch, schwul, bisexuell, transgender, queer / questioning, intersexuell, asexuell / aromantisch und weitere Identitäten','', 'LGBTQIA+ bezeichnet verschiedene sexuelle Orientierungen und geschlechtliche Identitäten.'],
+    ['LGBTQIA+','Abkürzung für lesbisch, schwul, bisexuell, transgender, queer / questioning, intersexuell, asexuell / aromantisch und weitere Identitäten','', 'LGBTQIA+ refers to a range of sexual orientations and gender identities.'],
     ['similarity','Ähnlichkeit; Gemeinsamkeit'],
     ['pidgin','Pidgin; vereinfachte Kontaktsprache','Pidginsprache'],
     ['to simplify','vereinfachen'],

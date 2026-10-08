@@ -11,7 +11,7 @@ Englischklasse der Jahrgangsstufe 10; gemeinsame Nutzung am Beamer, Bedienung du
 Vokabeln der bereitgestellten Seiten in einem Teamwettbewerb mit Zeitlimit und Punkten üben. Vom Nutzer bestätigt: gemeinsames Spielen in der Klasse und wettbewerbsorientierte Gestaltung.
 
 ## Brand Personality
-Deutlich verspielt, bunt, wettbewerbsorientiert. Auf ausdrücklichen Nutzerwunsch Computerspiel statt Schuloptik: dunkle Arcade-Lobby, Neonakzente, Team-Avatare, XP, Level-Fortschritt und Pokalfeier. Deutsche Bedienung, englische Vokabeln.
+Deutlich verspielt, bunt, wettbewerbsorientiert. Auf ausdrücklichen Nutzerwunsch Computerspiel statt Schuloptik: dunkle Arcade-Lobby, Neonakzente, Team-Avatare, XP, Level-Fortschritt und Pokalfeier. English interface throughout, including instructions, results, validation and accessibility labels. German remains only as vocabulary content in the translation tasks and word log.
 
 ## Anti-references
 Keine Schul- oder Arbeitsblattoptik, keine Werbe-Landingpage, keine Kleinkind-Motive.
