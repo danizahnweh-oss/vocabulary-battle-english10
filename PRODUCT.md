@@ -5,10 +5,10 @@
 product
 
 ## Users
-Englischklasse der Jahrgangsstufe 10; gemeinsame Nutzung am Beamer, Bedienung durch Lehrkraft oder Teams.
+Englischklasse der Jahrgangsstufe 10; gemeinsame Nutzung am Beamer, Bedienung durch Lehrkraft oder Teams. Zusätzlich allein am eigenen Gerät spielbar.
 
 ## Product Purpose
-Vokabeln der bereitgestellten Seiten in einem Teamwettbewerb mit Zeitlimit und Punkten üben. Vom Nutzer bestätigt: gemeinsames Spielen in der Klasse und wettbewerbsorientierte Gestaltung.
+Vokabeln der bereitgestellten Seiten in einem Teamwettbewerb oder im Solo-Modus mit Zeitlimit und Punkten üben. Vom Nutzer bestätigt: gemeinsames Spielen in der Klasse und wettbewerbsorientierte Gestaltung.
 
 ## Brand Personality
 Deutlich verspielt, bunt, wettbewerbsorientiert. Auf ausdrücklichen Nutzerwunsch Computerspiel statt Schuloptik: dunkle Arcade-Lobby, Neonakzente, Team-Avatare, XP, Level-Fortschritt und Pokalfeier. English interface throughout, including instructions, results, validation and accessibility labels. German remains only as vocabulary content in the translation tasks and word log.
@@ -17,7 +17,9 @@ Deutlich verspielt, bunt, wettbewerbsorientiert. Auf ausdrücklichen Nutzerwunsc
 Keine Schul- oder Arbeitsblattoptik, keine Werbe-Landingpage, keine Kleinkind-Motive.
 
 ## Design Principles
+- Solo-Modus mit eigenem Spielernamen, XP und direktem Wechsel zur nächsten Frage.
 - Gleiche Anzahl Fragen für jedes Team.
+- Schwierige Wörter nach einem Solo- oder Teamspiel erneut spielen.
 - Große, gut lesbare Fragen und Antworten.
 - Richtiges Wort nach jeder Antwort zeigen.
 - Zeitlimit vor Spielbeginn wählbar.
