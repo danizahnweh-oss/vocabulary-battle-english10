@@ -122,3 +122,24 @@ const RAW_VOCAB = {
   ]
 };
 const VOCAB = Object.entries(RAW_VOCAB).flatMap(([group, rows]) => rows.map((r, index) => ({id:`${group}-${index}`, group, en:r[0], de:r[1], aliases:(r[2]||'').split(';').map(s=>s.trim()).filter(Boolean), note:r[3]||''})));
+
+const EN_ALIASES = {
+  'cultures-7':['useful','helpful'], 'cultures-8':['declare'],
+  'cultures-10':['lyrics','song lyrics'], 'time-0':['age','era','period'],
+  'time-1':['age of enlightenment'], 'time-2':['elizabethan age'], 'time-3':['victorian age'], 'time-4':['middle ages'],
+  'relations-1':['descent'], 'relations-7':['ancestry'],
+  'development-2':['evolve'], 'development-4':['develop'],
+  'aggression-15':['revolt'], 'aggression-17':['rebel'],
+  'relations-9':['hand down','hand sth down','hand something down'],
+  'development-5':['found','establish'], 'systems-7':['colonize'], 'systems-8':['colonization'],
+  'systems-9':['feudal system'], 'systems-13':['lord','lady'], 'aggression-18':['revolutionize']
+};
+
+for(const word of VOCAB)word.enAliases=EN_ALIASES[word.id]||[];
+const GRADE=10;
+const VOCAB_NOTE='German meanings have been added to the “History words” vocabulary set.';
+const MISSIONS=[
+ {id:'cultures',title:'Across cultures',sub:'Same same but different?',icon:'🌍',groups:['cultures']},
+ {id:'scotland',title:'Scottish history',sub:'From “bravery” to “enlightenment”',icon:'🏰',groups:['scotland']},
+ {id:'history',title:'History words',sub:'Time, relations, development, systems & aggression',icon:'⏳',groups:['time','relations','development','systems','aggression']}
+];

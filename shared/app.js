@@ -3,42 +3,31 @@ const $ = s => document.querySelector(s);
 const main = $('#main');
 const TEAM_ICONS = ['🚀','🐯','👾','⚡'];
 const MODES = {choice:{name:'Quiz',icon:'🎯',hint:'Choose the correct translation.'},type:{name:'Type Attack',icon:'⌨️',hint:'Type one correct translation.'},truth:{name:'True or False',icon:'⚡',hint:'Decide whether the two words match.'},scramble:{name:'Word Scramble',icon:'🧩',hint:'Unscramble the translation and type your answer.'},pairs:{name:'Pair Match',icon:'🔗',hint:'Match each English word to its German meaning.'}};
-const TOPIC_ICONS = {cultures:'🌍',scotland:'🏰',history:'⏳'};
+
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const shuffle = arr => { const copy=[...arr]; for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];} return copy; };
 const normalise = value => value.normalize('NFKC').toLowerCase().replace(/ß/g,'ss').replace(/[’‘]/g,"'").replace(/[.,!?;:]/g,'').replace(/\s+/g,' ').trim().replace(/^to /,'');
-const EN_ALIASES = {
-  'cultures-7':['useful','helpful'], 'cultures-8':['declare'],
-  'cultures-10':['lyrics','song lyrics'], 'time-0':['age','era','period'],
-  'time-1':['age of enlightenment'], 'time-2':['elizabethan age'], 'time-3':['victorian age'], 'time-4':['middle ages'],
-  'relations-1':['descent'], 'relations-7':['ancestry'],
-  'development-2':['evolve'], 'development-4':['develop'],
-  'aggression-15':['revolt'], 'aggression-17':['rebel'],
-  'relations-9':['hand down','hand sth down','hand something down'],
-  'development-5':['found','establish'], 'systems-7':['colonize'], 'systems-8':['colonization'],
-  'systems-9':['feudal system'], 'systems-13':['lord','lady'], 'aggression-18':['revolutionize']
-};
-const EN_ALIAS_WORDS = new Set(Object.values(EN_ALIASES).flat().map(normalise));
+const EN_ALIAS_WORDS = new Set(VOCAB.flatMap(w=>w.enAliases||[]).map(normalise));
 const answerVariants = (word, lang) => {
-  if(lang === 'en') return [...new Set([word.en,...word.en.split(' / '),...(EN_ALIASES[word.id]||[])].map(normalise))];
+  if(lang === 'en') return [...new Set([word.en,...word.en.split(' / '),...(word.enAliases||[])].map(normalise))];
   const parts=word.de.split(';').flatMap(s => [s,...s.split(' / ')]);
   return [...new Set([...parts,...word.aliases.filter(s=>!EN_ALIAS_WORDS.has(normalise(s)))].map(normalise))];
 };
-let setup = {count:2, soloName:'Player 1', names:['Team 1','Team 2','Team 3','Team 4'],topics:['cultures','scotland','history'],mode:'mix',direction:'mixed',seconds:25,rounds:5};
+let setup = {count:2, soloName:'Player 1', names:['Team 1','Team 2','Team 3','Team 4'],topics:MISSIONS.map(m=>m.id),mode:'mix',direction:'mixed',seconds:25,rounds:5};
 let game = null, timer = null;
 function isSolo(){return setup.count===1;}
 function playerNames(){return isSolo()?[setup.soloName]:setup.names.slice(0,setup.count);}
 function announce(text){$('#announcer').textContent=text;}
 function focusHeading(){const h=main.querySelector('h1');if(h){h.tabIndex=-1;h.focus({preventScroll:true});}}
-function selectedWords(){return VOCAB.filter(v=>setup.topics.includes(v.group)||setup.topics.includes('history')&&!['cultures','scotland'].includes(v.group));}
+function selectedWords(){const groups=MISSIONS.filter(m=>setup.topics.includes(m.id)).flatMap(m=>m.groups);return VOCAB.filter(v=>groups.includes(v.group));}
 function stopTimer(){if(timer){clearInterval(timer);timer=null;}}
 function renderSetup(){
   stopTimer();game=null;$('#word-list').disabled=false;
-  main.innerHTML=`<div class="intro"><div><h1>Level up<br><span>your words.</span></h1><p>Go solo or build your crew. Pick a mission. Rack up XP.</p></div><div class="intro-sticker"><span aria-hidden="true">👾</span><b>SOLO +<br>SQUADS</b><span class="sticker-small">Play your way</span></div></div>
+  main.innerHTML=`<div class="intro"><div><h1>Level up<br><span>your words.</span></h1><p><strong>English ${GRADE}</strong> · Go solo or build your crew. Pick a mission. Rack up XP.</p></div><div class="intro-sticker"><span aria-hidden="true">👾</span><b>SOLO +<br>SQUADS</b><span class="sticker-small">Play your way</span></div></div>
   <form id="setup-form"><div class="setup-grid"><div>
   <section class="section" aria-labelledby="teams-title"><div class="section-title"><span class="step" aria-hidden="true">01</span><h2 id="teams-title">Solo or squad?</h2></div><div class="team-count" role="group" aria-label="Players and teams">${[1,2,3,4].map(n=>`<button class="choice" type="button" data-count="${n}" aria-pressed="${setup.count===n}">${n===1?'Solo':n+' Teams'}</button>`).join('')}</div><div class="team-inputs ${isSolo()?'solo-input':''}">${Array.from({length:setup.count},(_,i)=>`<div class="team-entry team-color-${i}"><label for="team-${i}"><span class="team-avatar" aria-hidden="true">${TEAM_ICONS[i]}</span> ${isSolo()?'Player name':'Team '+(i+1)}</label><input id="team-${i}" name="team-${i}" maxlength="24" value="${escapeHTML(isSolo()?setup.soloName:setup.names[i])}" autocomplete="off" required></div>`).join('')}</div></section>
   <section class="section" aria-labelledby="topics-title"><div class="section-title"><span class="step" aria-hidden="true">02</span><h2 id="topics-title">Choose your mission</h2></div>
-  ${[['cultures','Across cultures','Same same but different?',11],['scotland','Scottish history','From “bravery” to “enlightenment”',18],['history','History words','Time, relations, development, systems & aggression',VOCAB.length-29]].map(([id,title,sub,count])=>`<label class="topic topic-${id}"><span class="topic-icon" aria-hidden="true">${TOPIC_ICONS[id]}</span><input type="checkbox" name="topic" value="${id}" ${setup.topics.includes(id)?'checked':''}><span class="topic-copy"><strong lang="en">${title}</strong><span>${sub}</span></span><span class="word-count">${count} words</span></label>`).join('')}
+  ${MISSIONS.map(({id,title,sub,icon,groups})=>`<label class="topic topic-${id}"><span class="topic-icon" aria-hidden="true">${icon}</span><input type="checkbox" name="topic" value="${id}" ${setup.topics.includes(id)?'checked':''}><span class="topic-copy"><strong lang="en">${escapeHTML(title)}</strong><span>${escapeHTML(sub)}</span></span><span class="word-count">${VOCAB.filter(w=>groups.includes(w.group)).length} words</span></label>`).join('')}
   <p class="hint" id="selection-count"></p></section>
   </div><aside class="rules" aria-labelledby="rules-title"><h2 id="rules-title"><span aria-hidden="true">🎮</span> Match setup</h2>
   <div class="field"><label for="mode">Game mode</label><select id="mode"><option value="mix">Arcade Mix · All 5 games</option>${Object.entries(MODES).map(([id,m])=>`<option value="${id}">${m.name}</option>`).join('')}</select><p class="hint" id="mode-description"></p></div>
@@ -219,4 +208,6 @@ document.addEventListener('fullscreenchange',()=>{$('#fullscreen').textContent=d
 document.addEventListener('invalid',e=>{if(e.target.matches('input[required]'))e.target.setCustomValidity(e.target.id==='typed-answer'?`Enter a translation in ${game?.current?.target==='de'?'German':'English'}.`:isSolo()?'Enter your player name.':'Enter a team name.');},true);
 document.addEventListener('input',e=>{if(e.target.matches('input[required]'))e.target.setCustomValidity('');});
 document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||document.querySelector('dialog[open]')||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(game?.phase==='question'&&game.current.mode==='choice'&&/^[1-4]$/.test(e.key)){e.preventDefault();submitAnswer(Number(e.key)-1);}});
+$('#vocab-total').textContent=`${VOCAB.length} words · ${Object.keys(MODES).length} game modes`;
+$('#word-log-intro').textContent=`All ${VOCAB.length} words for English ${GRADE}. ${VOCAB_NOTE}`;
 renderSetup();

@@ -5,7 +5,7 @@
 product
 
 ## Users
-Englischklasse der Jahrgangsstufe 10; gemeinsame Nutzung am Beamer, Bedienung durch Lehrkraft oder Teams. Zusätzlich allein am eigenen Gerät spielbar.
+Englischklassen der Jahrgangsstufen 7 und 10; gemeinsame Nutzung am Beamer, Bedienung durch Lehrkraft oder Teams. Zusätzlich allein am eigenen Gerät spielbar.
 
 ## Product Purpose
 Vokabeln der bereitgestellten Seiten in einem Teamwettbewerb oder im Solo-Modus mit Zeitlimit und Punkten üben. Vom Nutzer bestätigt: gemeinsames Spielen in der Klasse und wettbewerbsorientierte Gestaltung.
@@ -32,3 +32,9 @@ Tastaturbedienung, große Schaltflächen, verständliche Statusmeldungen, Kontra
 Arcade Mix is the default: Quiz, Type Attack, True or False, Word Scramble and Pair Match. A shuffled five-mode cycle is shared by all teams; mixed runs have at least five challenges per player/team. Individual modes remain selectable. Translation direction defaults to alternating German → English and English → German, shared by teams each round. Pair Match always shows both languages. Pair Match awards the normal challenge score after all pairs are matched; a wrong pair ends the challenge and unmatched words enter the review pool.
 
 All three vocabulary missions (all 100 words) are selected by default.
+
+## Routes and Vocabulary
+- `/10/`: 100 words, Across cultures and Scottish history.
+- `/7/`: 49 complete headwords from the three Unit 1 “Find your place” photos: 21 Check-in entries (page 183 and first two entries on page 184), 28 Station 1 entries (page 184 and the supplied part of page 185). Cropped Station 2 entries are not guessed.
+- Both routes use `shared/app.js` and `shared/style.css`; vocabulary, accepted variants and mission metadata stay in their own grade folder. Word counts are calculated from each dataset.
+- New vocabulary belongs to the requested grade. Each grade defaults to all its missions, all five game modes and both directions.
