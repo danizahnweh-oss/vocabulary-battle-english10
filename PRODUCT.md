@@ -50,3 +50,8 @@ Flashcards use the selected missions, with saved mistakes first. Mistake IDs are
 
 ## Automatic Progression
 Correct game answers and flashcard recalls advance automatically after 1.2 seconds of feedback. Solo games show the next question; team games show the next team’s ready screen, preserving preparation time. Wrong answers and timeouts stay visible until Next is chosen. Next remains available for immediate progression. Automatic progression pauses while the quit dialog or a hidden tab is active, and pending callbacks are cancelled when leaving or starting another activity.
+
+## Multiple-Choice Alternatives
+Answer options share the question's part of speech (nouns, verbs, adjectives, adverbs and other classes). Choices favour the same vocabulary section, then the same mission, with comparable label lengths. Equivalent translations and overlapping alternative answers are excluded. Polysemous German labels show senses that fit the word class. Rare word classes use a checked backup bank for distractors only; those words never enter the question deck.
+
+After any vocabulary update, regenerate and review all grammar tags with `node scripts/build-word-types.cjs`; the review table is written to `/tmp/vocab-word-types.tsv`. Maintain exceptions in that script for ambiguous headwords and word classes without reliable spelling cues. Run `node tests/choice-grammar.cjs` to check both directions for every entry, including grammar fixtures, ambiguity, four options and topic preference.

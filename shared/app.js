@@ -101,12 +101,37 @@ function renderReady(){
   $('#arena').innerHTML=`<div class="ready team-color-${game.turn%game.teams.length}"><div class="ready-avatar" aria-hidden="true">${TEAM_ICONS[game.turn%game.teams.length]}</div><span class="ready-round">${isSolo()?(SENIOR?'Solo challenge':'Your solo mission'):(SENIOR?'Next team':'Next crew up')}</span><h1 class="ready-team">${escapeHTML(activeTeam().name)}</h1><p>${setup.seconds?`You have ${setup.seconds} seconds once the question starts.`:'Take your time to find the answer.'} ${isSolo()?'Trust your instincts and collect as much XP as you can.':'Talk it over and submit one answer together.'}</p><button id="begin-question" class="primary">${SENIOR?'Start challenge':'Start mission'}</button><p class="hint" style="margin-top:24px">${setup.mode==='mix'?(SENIOR?'Mixed challenge · All 5 games':'Arcade Mix · All 5 games'):MODES[setup.mode].name} · ${setup.direction==='mixed'?'Both translation directions':setup.direction==='de-en'?'German → English':'English → German'}</p></div>`;
   $('#begin-question').addEventListener('click',renderQuestion);focusHeading();
 }
+// Rare word classes have a small, checked backup bank for answer options only.
+// These words never enter the question deck or change the selected vocabulary.
+const DISTRACTOR_BACKUPS={
+ conjunction:[['although','obwohl'],['unless','wenn nicht; es sei denn'],['because','weil'],['while','während']],
+ numeral:[['three','drei'],['seven','sieben'],['twelve','zwölf'],['twenty','zwanzig']],
+ determiner:[['every','jeder; jede; jedes'],['many','viele'],['enough','genug'],['no','kein; keine']],
+ pronoun:[['everyone','jeder; alle'],['herself','sich selbst (weiblich)'],['nothing','nichts'],['someone','jemand']]
+};
+function wordType(word){return word.pos||WORD_TYPES[GRADE][word.id]?.[0];}
+function choiceLabel(word,lang){return lang==='de'?(WORD_TYPES[GRADE][word.id]?.[1]||word.de):word.en;}
 function makeChoices(word,lang){
   const accepted=new Set(answerVariants(word,lang));
   const equivalent=new Set(answerVariants(word,lang==='en'?'de':'en'));
-  const candidates=shuffle(VOCAB.filter(v=>v.id!==word.id&&!answerVariants(v,lang).some(a=>accepted.has(a))&&!answerVariants(v,lang==='en'?'de':'en').some(a=>equivalent.has(a))));
-  const choices=[{word,correct:true}], labels=new Set([word[lang]]);
-  for(const v of candidates){if(!labels.has(v[lang])){choices.push({word:v,correct:false});labels.add(v[lang]);}if(choices.length===4)break;}
+  const pos=wordType(word),groups=word.groups||[word.group];
+  const related=[...new Set([...groups,...MISSIONS.filter(m=>m.groups.some(g=>groups.includes(g))).flatMap(m=>m.groups)])];
+  const eligible=v=>v.id!==word.id&&wordType(v)===pos&&!answerVariants(v,lang).some(a=>accepted.has(a))&&!answerVariants(v,lang==='en'?'de':'en').some(a=>equivalent.has(a));
+  // Keep the grammar fixed, then favour the same topic and similar label lengths.
+  const score=v=>(wordInGroups(v,groups)?8:wordInGroups(v,related)?4:0)-Math.abs(Math.log((choiceLabel(v,lang).length+1)/(choiceLabel(word,lang).length+1)));
+  const candidates=shuffle(VOCAB.filter(eligible)).sort((a,b)=>score(b)-score(a));
+  const topic=candidates.filter(v=>wordInGroups(v,groups)),nearby=candidates.filter(v=>!wordInGroups(v,groups)&&wordInGroups(v,related)),other=candidates.filter(v=>!wordInGroups(v,related));
+  const ranked=[...shuffle(topic.slice(0,12)),...topic.slice(12),...shuffle(nearby.slice(0,12)),...nearby.slice(12),...shuffle(other.slice(0,12)),...other.slice(12)];
+  const backups=(DISTRACTOR_BACKUPS[pos]||[]).map(([en,de],i)=>({id:`option-${pos}-${i}`,en,de,pos,aliases:[],enAliases:[],group:''})).filter(eligible);
+  const choices=[{word,correct:true,label:choiceLabel(word,lang)}],labels=new Set([normalise(choiceLabel(word,lang))]);
+  // Distractors must also be distinct from each other, including alternative senses.
+  const chosen=[word];
+  for(const v of [...ranked,...shuffle(backups)]){
+    const label=choiceLabel(v,lang);
+    if(labels.has(normalise(label))||chosen.some(w=>answerVariants(w,lang).some(a=>answerVariants(v,lang).includes(a))))continue;
+    choices.push({word:v,correct:false,label});chosen.push(v);labels.add(normalise(label));
+    if(choices.length===4)break;
+  }
   return shuffle(choices);
 }
 function puzzleAnswer(word,lang){
@@ -138,7 +163,7 @@ function renderQuestion(){
   game.phase='question';main.innerHTML=gameFrame();bindQuit();
   const language=target==='en'?'English':'German';
   let content='';
-  if(mode==='choice')content=`<div class="answers">${c.choices.map((choice,i)=>`<button class="answer" data-answer="${i}"><span class="key" aria-hidden="true">${i+1}</span><span lang="${target}">${escapeHTML(choice.word[target])}</span></button>`).join('')}</div>`;
+  if(mode==='choice')content=`<div class="answers">${c.choices.map((choice,i)=>`<button class="answer" data-answer="${i}"><span class="key" aria-hidden="true">${i+1}</span><span lang="${target}">${escapeHTML(choice.label)}</span></button>`).join('')}</div>`;
   if(mode==='truth')content=`<div class="translation-candidate" lang="${target}">${escapeHTML(c.shown[target])}</div><div class="answers truth-answers"><button class="answer" data-truth="true"><span aria-hidden="true">✓</span> True</button><button class="answer" data-truth="false"><span aria-hidden="true">×</span> False</button></div>`;
   if(mode==='type'||mode==='scramble')content=`${mode==='scramble'?`<div class="scramble-board"><span class="hint">Decode this ${language} translation</span><p class="scrambled-letters" lang="${target}">${escapeHTML(scrambleText(c.puzzle))}</p></div>`:''}<form id="answer-form"><label for="typed-answer">Your answer in ${language}</label><div class="typing-row"><input class="typed-input" id="typed-answer" autocomplete="off" autocapitalize="none" spellcheck="false" lang="${target}" placeholder="${language} translation" required><button class="primary" type="submit">Check answer</button></div><p class="hint">One correct translation is enough.${target==='en'?' “to” is optional for verbs.':''}</p></form>`;
   if(mode==='pairs')content=`<p class="pair-instructions">Select a word, then its match in the other column. Complete all ${c.pairs.length} ${c.pairs.length===1?'pair':'pairs'} to earn XP. A wrong pair ends this challenge.</p><p class="pair-progress" id="pair-progress" role="status">0 / ${c.pairs.length} matched</p><div class="pair-board">${['en','de'].map(lang=>`<div class="pair-column"><h2>${lang==='en'?'English':'German'}</h2>${shuffle(c.pairs).map(w=>`<button class="pair-tile" data-pair="${w.id}" data-lang="${lang}" aria-pressed="false"><span lang="${lang}">${escapeHTML(w[lang])}</span><span class="pair-mark" aria-hidden="true"></span></button>`).join('')}</div>`).join('')}</div>`;
