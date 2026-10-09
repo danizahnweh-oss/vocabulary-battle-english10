@@ -16,6 +16,7 @@ function startFlashcards(words,mandatory=false){
  if(game)game.phase='cards';$('#word-list').disabled=true;renderFlashcard();
 }
 function renderFlashcard(){
+ cancelAutoAdvance();
  const session=cardSession;
  if(!session.queue.length){
   $('#word-list').disabled=false;
@@ -34,8 +35,9 @@ function renderFlashcard(){
   $('#card-answer').disabled=true;$('#card-form button').disabled=true;$('#card-flip').disabled=true;
   session.queue.shift();if(correct){session.completed++;if(!session.queue.some(x=>x.word.id===c.word.id)){pendingMistakes.delete(c.word.id);saveMistakes();}}
   else{rememberMistakes([c.word]);session.queue.push(c);if(!session.queue.some(x=>x!==c&&x.word.id===c.word.id)){session.queue.push({word:c.word,target:setup.direction==='mixed'?(c.target==='en'?'de':'en'):c.target});session.total++;}}
-  $('#card-feedback').innerHTML=`<div class="feedback ${correct?'':'fail'}"><div><h2>${correct?'Correct recall!':'Keep practising this word.'}</h2><p><span lang="en">${escapeHTML(c.word.en)}</span> = <span lang="de">${escapeHTML(c.word.de)}</span></p><p class="hint">${correct?'Your progress is saved.':'This card will return. You need two correct recalls to master it.'}</p></div><button class="primary" id="next-card">${session.queue.length?'Next card':session.mandatory?'Unlock results':'Finish practice'}</button></div>`;
-  $('#next-card').onclick=renderFlashcard;$('#next-card').focus({preventScroll:true});
+  $('#card-feedback').innerHTML=`<div class="feedback ${correct?'':'fail'}"><div><h2>${correct?'Correct recall!':'Keep practising this word.'}</h2><p><span lang="en">${escapeHTML(c.word.en)}</span> = <span lang="de">${escapeHTML(c.word.de)}</span></p><p class="hint">${correct?'Your progress is saved. Continuing automatically.':'This card will return. You need two correct recalls to master it.'}</p></div><button class="primary" id="next-card">${session.queue.length?'Next card':session.mandatory?'Unlock results':'Finish practice'}</button></div>`;
+  const advance=()=>{if(cardSession!==session||session.phase!=='feedback')return;cancelAutoAdvance();session.phase='advancing';renderFlashcard();};
+  $('#next-card').onclick=advance;if(correct)scheduleAutoAdvance(advance);$('#next-card').focus({preventScroll:true});
  };
  focusHeading();
 }

@@ -18,13 +18,22 @@ const answerVariants = (word, lang) => {
 };
 let setup = {count:2, soloName:'Player 1', names:['Team 1','Team 2','Team 3','Team 4'],topics:MISSIONS.map(m=>m.id),mode:'mix',direction:'mixed',seconds:25,rounds:5,customRounds:true};
 let game = null, timer = null;
+let feedbackTimer = null, feedbackAdvance = null;
+const AUTO_ADVANCE_MS = 1200;
+function pauseAutoAdvance(){if(feedbackTimer!==null)clearTimeout(feedbackTimer);feedbackTimer=null;}
+function cancelAutoAdvance(){pauseAutoAdvance();feedbackAdvance=null;}
+function resumeAutoAdvance(){
+  if(!feedbackAdvance||feedbackTimer!==null||document.hidden||document.querySelector('dialog[open]'))return;
+  feedbackTimer=setTimeout(()=>{feedbackTimer=null;if(document.hidden||document.querySelector('dialog[open]'))return;const advance=feedbackAdvance;feedbackAdvance=null;advance?.();},AUTO_ADVANCE_MS);
+}
+function scheduleAutoAdvance(advance){cancelAutoAdvance();feedbackAdvance=advance;resumeAutoAdvance();}
 function isSolo(){return setup.count===1;}
 function playerNames(){return isSolo()?[setup.soloName]:setup.names.slice(0,setup.count);}
 function announce(text){$('#announcer').textContent=text;}
 function focusHeading(){const h=main.querySelector('h1');if(h){h.tabIndex=-1;h.focus({preventScroll:true});}}
 function wordInGroups(word,groups){return (word.groups||[word.group]).some(group=>groups.includes(group));}
 function selectedWords(){const groups=MISSIONS.filter(m=>setup.topics.includes(m.id)).flatMap(m=>m.groups);return VOCAB.filter(v=>wordInGroups(v,groups));}
-function stopTimer(){if(timer){clearInterval(timer);timer=null;}}
+function stopTimer(){cancelAutoAdvance();if(timer){clearInterval(timer);timer=null;}}
 function renderSetup(){
   stopTimer();game=null;$('#word-list').disabled=false;
   main.innerHTML=`<div class="intro"><div><h1>${SENIOR?'Vocabulary<br><span>Challenge.</span>':'Level up<br><span>your words.</span>'}</h1><p><strong>English ${GRADE}</strong> · ${SENIOR?'Compete with your class or challenge yourself. Accuracy and speed decide the score.':'Go solo or build your crew. Pick a mission. Rack up XP.'}</p></div><div class="intro-sticker"><span aria-hidden="true">👾</span><b>SOLO +<br>SQUADS</b><span class="sticker-small">Play your way</span></div></div>
@@ -86,7 +95,7 @@ function roundIndicators(round){
   return (start?'<span>…</span>':'')+Array.from({length:count},(_,n)=>{const i=start+n;return `<span class="${i<round?'done':i===round?'current':''}">${i<round?'✓':i+1}</span>`;}).join('')+(start+count<setup.rounds?'<span>…</span>':'');
 }
 function gameFrame(){const round=Math.floor(game.turn/game.teams.length);return `<div class="game-top"><div><strong>${SENIOR?'Round':'Level'} ${round+1} / ${setup.rounds}</strong><p>Challenge ${game.turn+1} of ${game.deck.length}</p></div><div class="round-track" aria-hidden="true">${roundIndicators(round)}<span class="finish-flag">🏁</span></div><button id="quit" class="quiet">End match</button></div>${scoreboard()}<section class="arena" id="arena"></section>`;}
-function bindQuit(){$('#quit').addEventListener('click',()=>$('#quit-dialog').showModal());}
+function bindQuit(){$('#quit').addEventListener('click',()=>{pauseAutoAdvance();$('#quit-dialog').showModal();});}
 function renderReady(){
   game.phase='ready';main.innerHTML=gameFrame();bindQuit();
   $('#arena').innerHTML=`<div class="ready team-color-${game.turn%game.teams.length}"><div class="ready-avatar" aria-hidden="true">${TEAM_ICONS[game.turn%game.teams.length]}</div><span class="ready-round">${isSolo()?(SENIOR?'Solo challenge':'Your solo mission'):(SENIOR?'Next team':'Next crew up')}</span><h1 class="ready-team">${escapeHTML(activeTeam().name)}</h1><p>${setup.seconds?`You have ${setup.seconds} seconds once the question starts.`:'Take your time to find the answer.'} ${isSolo()?'Trust your instincts and collect as much XP as you can.':'Talk it over and submit one answer together.'}</p><button id="begin-question" class="primary">${SENIOR?'Start challenge':'Start mission'}</button><p class="hint" style="margin-top:24px">${setup.mode==='mix'?(SENIOR?'Mixed challenge · All 5 games':'Arcade Mix · All 5 games'):MODES[setup.mode].name} · ${setup.direction==='mixed'?'Both translation directions':setup.direction==='de-en'?'German → English':'English → German'}</p></div>`;
@@ -183,10 +192,13 @@ function submitAnswer(value){
   else {$('#typed-answer').disabled=true;$('#answer-form button').disabled=true;}
   main.querySelector('.scoreboard').outerHTML=scoreboard();
   const heading=correct?`Correct! +${100+bonus} XP`:timedOut?'Time is up.':'Not quite. Learn this one!';
-  $('#feedback-slot').innerHTML=`<div class="feedback ${correct?'':'fail'}"><span class="feedback-icon" aria-hidden="true">${correct?'🌟':timedOut?'⏰':'💡'}</span><div class="feedback-copy"><h3>${heading}</h3><p><span lang="en">${escapeHTML(c.word.en)}</span> = <span lang="de">${escapeHTML(c.word.de)}</span></p>${correct&&bonus?`<p class="hint">100 XP + ${bonus} speed bonus</p>`:''}${c.mode==='pairs'?c.pairs.filter(w=>w.id!==c.word.id).map(w=>`<p><span lang="en">${escapeHTML(w.en)}</span> = <span lang="de">${escapeHTML(w.de)}</span></p>`).join(''):''}${c.word.note?`<p class="hint">${escapeHTML(c.word.note)}</p>`:''}</div><button class="primary" id="next">${game.turn+1===game.deck.length?'View results':isSolo()?'Next question':'Next team'}</button></div>`;
+  $('#feedback-slot').innerHTML=`<div class="feedback ${correct?'':'fail'}"><span class="feedback-icon" aria-hidden="true">${correct?'🌟':timedOut?'⏰':'💡'}</span><div class="feedback-copy"><h3>${heading}</h3><p><span lang="en">${escapeHTML(c.word.en)}</span> = <span lang="de">${escapeHTML(c.word.de)}</span></p>${correct&&bonus?`<p class="hint">100 XP + ${bonus} speed bonus</p>`:''}${c.mode==='pairs'?c.pairs.filter(w=>w.id!==c.word.id).map(w=>`<p><span lang="en">${escapeHTML(w.en)}</span> = <span lang="de">${escapeHTML(w.de)}</span></p>`).join(''):''}${c.word.note?`<p class="hint">${escapeHTML(c.word.note)}</p>`:''}${correct?'<p class="hint">Continuing automatically.</p>':''}</div><button class="primary" id="next">${game.turn+1===game.deck.length?'View results':isSolo()?'Next question':'Next team'}</button></div>`;
   $('#announcer').innerHTML=`${escapeHTML(heading)} <span lang="en">${escapeHTML(c.word.en)}</span>: <span lang="de">${escapeHTML(c.word.de)}</span>`;
   if(correct)celebrate();
-  $('#next').addEventListener('click',()=>{game.turn++;if(game.turn>=game.deck.length)renderResults();else if(isSolo())renderQuestion();else renderReady();});
+  const match=game;
+  const advance=()=>{if(game!==match||game.phase!=='feedback'||game.current!==c)return;cancelAutoAdvance();game.turn++;if(game.turn>=game.deck.length)renderResults();else if(isSolo())renderQuestion();else renderReady();};
+  $('#next').addEventListener('click',advance);
+  if(correct)scheduleAutoAdvance(advance);
   $('#next').focus({preventScroll:true});
 }
 function renderResults(){
@@ -216,7 +228,9 @@ function renderWords(){const query=normalise($('#word-search').value);const word
 $('#word-list').addEventListener('click',()=>{renderWords();$('#words-dialog').showModal();});
 $('#close-words').addEventListener('click',()=>$('#words-dialog').close());
 $('#word-search').addEventListener('input',renderWords);
-$('#keep-playing').addEventListener('click',()=>$('#quit-dialog').close());
+$('#keep-playing').addEventListener('click',()=>{$('#quit-dialog').close();resumeAutoAdvance();});
+$('#quit-dialog').addEventListener('close',resumeAutoAdvance);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseAutoAdvance();else resumeAutoAdvance();});
 $('#confirm-quit').addEventListener('click',()=>{$('#quit-dialog').close();renderSetup();focusHeading();});
 $('#fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{announce('Full screen is not available in this browser.');$('#fullscreen').textContent='Full screen unavailable';}});
 if(!document.documentElement.requestFullscreen)$('#fullscreen').hidden=true;
