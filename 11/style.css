@@ -1,0 +1,56 @@
+/* Grade 11: a restrained competition screen for classroom projection and phones. */
+:root{color-scheme:light;--bg:oklch(.975 .004 180);--surface:oklch(.995 .001 180);--ink:oklch(.25 .025 180);--muted:oklch(.45 .02 180);--line:oklch(.75 .02 180);--brand:oklch(.43 .075 180);--brand-soft:oklch(.94 .025 180);--accent:var(--brand);--green:oklch(.39 .085 155);--green-soft:oklch(.94 .025 155);--red:oklch(.43 .16 25);--red-soft:oklch(.95 .02 25);--radius:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.senior .header{min-height:80px;border-bottom:1px solid var(--line)}
+.senior .brand-mark{transform:none;box-shadow:none;background:var(--brand);color:var(--surface);border-radius:4px}
+.senior .brand{font-size:1.125rem}.senior .course,.senior footer{font-family:inherit;color:var(--muted)}
+.senior .quiet{background:transparent;border:1px solid transparent;font-weight:600}.senior .quiet:hover{background:var(--brand-soft);border-color:var(--line)}
+.senior button:focus-visible,.senior a:focus-visible,.senior input:focus-visible,.senior select:focus-visible,.senior summary:focus-visible{outline-color:var(--brand)}
+.senior h1,.senior h2,.senior h3{font-weight:700}.senior h1:focus-visible{outline-color:var(--brand)}
+.senior main{max-width:1280px;padding-top:48px}.senior .intro{margin-bottom:40px;align-items:flex-start}
+.senior .intro h1{font-size:3rem;line-height:1.15;letter-spacing:-.025em}.senior .intro p{max-width:65ch;font-size:1rem;margin-top:16px}
+.senior .intro-sticker,.senior .topic-icon,.senior .step,.senior .rules h2>span,.senior .points-preview>span,.senior .feedback-icon,.senior .trophy,.senior .finish-flag,.senior .mode-badge>span{display:none}
+.senior .setup-grid{grid-template-columns:minmax(0,1fr) 352px;gap:48px}.senior .section-title h2{font-size:1.5rem}
+.senior .choice{box-shadow:none;border:1px solid var(--line);background:var(--surface);font-weight:600;min-height:48px}
+.senior .choice[aria-pressed=true]{color:var(--surface);background:var(--brand);border-color:var(--brand)}
+.senior .choice:active:not(:disabled){transform:translateY(1px);box-shadow:none}
+.senior .team-entry{padding:0;background:transparent;border:0;border-radius:0}.senior .team-entry label{font-weight:600;color:var(--ink);font-size:.875rem}
+.senior .team-avatar{width:32px;height:32px;border-radius:4px;background:var(--brand-soft);border:0;color:var(--brand);font-size:.875rem;font-weight:700;line-height:1}
+.senior .team-color-0,.senior .team-color-1,.senior .team-color-2,.senior .team-color-3{--team:var(--brand);--team-dark:var(--brand-soft)}
+.senior input,.senior select{background:var(--surface);border:1px solid var(--line);font-weight:400;color:var(--ink)}
+.senior .topic{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;margin-bottom:0;padding:20px 0;gap:16px}
+.senior .topic:has(input:checked){background:transparent;border-color:var(--line)}.senior .topic input{order:0;accent-color:var(--brand);width:22px;height:22px}
+.senior .topic-copy strong{font-weight:650;font-size:1rem}.senior .word-count{font-family:inherit;font-size:.875rem;color:var(--muted)}
+.senior .rules{background:var(--surface);border:1px solid var(--line);box-shadow:none;border-radius:8px;padding:24px}
+.senior .rules h2{color:var(--ink)}.senior .points-preview{margin-top:24px}.senior .points-preview strong{font-size:2rem;font-weight:700;line-height:1.2;color:var(--brand)}
+.senior .primary,.senior .secondary{border:1px solid var(--line);box-shadow:none;min-height:48px;font-weight:650;border-radius:6px}
+.senior .primary{background:var(--brand);border-color:var(--brand);color:var(--surface)}.senior .primary:hover{background:oklch(.35 .07 180);border-color:oklch(.35 .07 180);transform:none}
+.senior .secondary{background:var(--surface);color:var(--ink)}.senior .secondary:hover{background:var(--brand-soft)}
+.senior .primary:active:not(:disabled),.senior .secondary:active:not(:disabled){transform:translateY(1px);box-shadow:none}
+.senior .game-top>div>strong{font-family:inherit;font-weight:700;color:var(--ink)}
+.senior .round-track .current{box-shadow:none;transform:none;color:var(--surface);background:var(--brand);border-color:var(--brand)}
+.senior .round-track>span{font-family:inherit}.senior .score-team{border:1px solid var(--line);box-shadow:none;background:var(--surface);border-radius:8px}
+.senior .score-team.active{background:var(--brand-soft);border:2px solid var(--brand);box-shadow:none}
+.senior .score-team strong,.senior .rank,.senior .rank-points{font-family:inherit;font-variant-numeric:tabular-nums}.senior .score-team small{color:var(--ink);font-weight:650}
+.senior .arena{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:32px}
+.senior .mode-badge{color:var(--brand);font-weight:700;font-size:1rem}.senior .direction{font-weight:500;color:var(--muted)}
+.senior .timer-box{background:var(--brand-soft);border:0}.senior .timer,.senior .timer-label{font-family:inherit}.senior .timer.urgent{color:var(--red)}
+.senior .question-title{font-size:2.5rem;color:var(--ink)}.senior .question-title.long{font-size:1.5rem}
+.senior .answer{background:var(--surface);border:1px solid var(--line);box-shadow:none;color:var(--ink);font-weight:600;min-height:88px;padding:24px;border-radius:8px}
+.senior .answer:hover:not(:disabled){background:var(--brand-soft);border-color:var(--brand);transform:none}.senior .answer:active:not(:disabled){transform:translateY(1px);box-shadow:none}
+.senior .answer .key{background:var(--brand-soft);border:0;color:var(--brand);font-family:inherit;border-radius:4px}
+.senior .answer.correct{background:var(--green-soft);border-color:var(--green);color:var(--green)}.senior .answer.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.senior .feedback{border:1px solid var(--green);border-radius:8px;box-shadow:none}.senior .feedback.fail{border-color:var(--red)}
+.senior .ready-avatar{box-shadow:none;transform:none;border:0;background:var(--brand-soft);color:var(--brand);width:64px;height:64px;font-size:2rem;border-radius:8px}
+.senior .ready-round{font-family:inherit;font-weight:600}.senior .ready h1{font-size:2.5rem;color:var(--ink)}
+.senior .tag{font-family:inherit;background:var(--brand-soft);color:var(--brand);font-weight:600}.senior .results-heading h1{color:var(--ink);font-size:2.5rem}
+.senior .ranking-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:none}
+.senior .ranking-row.winner{background:var(--brand-soft);border:2px solid var(--brand);box-shadow:none}
+.senior .pair-tile,.senior .pair-column:last-child .pair-tile{background:var(--surface);border:1px solid var(--line);font-weight:600;color:var(--ink)}
+.senior .pair-tile[aria-pressed=true]{background:var(--brand-soft);border-color:var(--brand);box-shadow:0 0 0 2px var(--brand)}
+.senior .pair-tile.pair-matched{background:var(--green-soft);border-color:var(--green);color:var(--green)}.senior .pair-tile.pair-wrong{border-color:var(--red);background:var(--red-soft)}
+.senior .translation-candidate,.senior .scramble-board,.senior #card-back{background:var(--brand-soft);border:1px solid var(--line);border-radius:8px}
+.senior .scrambled-letters{font-weight:600}.senior dialog{background:var(--surface);border:1px solid var(--line);box-shadow:none}
+.senior dialog::backdrop{background:oklch(.2 .02 180 / .65)}.senior .review{background:var(--surface)}
+.senior .flashcard-face{padding:24px 0}.senior .card-translation{font-size:1.5rem;font-weight:650}
+@media(max-width:1000px){.senior .setup-grid{grid-template-columns:minmax(0,1fr) 304px;gap:32px}}
+@media(max-width:680px){.senior main{padding:32px 16px}.senior .setup-grid{display:block}.senior .intro h1{font-size:2.25rem}.senior .intro p{font-size:1rem;max-width:65ch}.senior .section-title h2{font-size:1.25rem}.senior .topic{gap:12px;padding:16px 0}.senior .topic-copy{min-width:0}.senior .topic-copy strong{font-size:.9375rem}.senior .word-count{font-size:.75rem}.senior .team-inputs{grid-template-columns:1fr}.senior .arena{padding:24px 16px}.senior .question-title{font-size:1.75rem}.senior .question-title.long{font-size:1.25rem}.senior .answer{min-height:80px;font-size:1.125rem;padding:16px}.senior .feedback-copy{flex-basis:100%}.senior .feedback h3{font-size:1.25rem}.senior .ready h1,.senior .results-heading h1{font-size:2rem}.senior .brand{font-size:1rem}.senior .rank-points{font-size:1.25rem}.senior .header-right{margin-left:0}.senior .brand-mark{width:32px;height:32px}}
