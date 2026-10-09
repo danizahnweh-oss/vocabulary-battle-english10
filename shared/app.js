@@ -37,7 +37,7 @@ function stopTimer(){cancelAutoAdvance();if(timer){clearInterval(timer);timer=nu
 function renderSetup(){
   stopTimer();game=null;$('#word-list').disabled=false;
   main.innerHTML=`<div class="intro"><div><h1>${SENIOR?'Vocabulary<br><span>Challenge.</span>':'Level up<br><span>your words.</span>'}</h1><p><strong>English ${GRADE}</strong> · ${SENIOR?'Compete with your class or challenge yourself. Accuracy and speed decide the score.':'Go solo or build your crew. Pick a mission. Rack up XP.'}</p></div><div class="intro-sticker"><span aria-hidden="true">👾</span><b>SOLO +<br>SQUADS</b><span class="sticker-small">Play your way</span></div></div>
-  <form id="setup-form"><div class="setup-grid"><div>
+  <form id="setup-form"><section class="learn-entry" aria-labelledby="learn-entry-title"><div><h2 id="learn-entry-title">Learn vocabulary</h2><p>Discover 5 words at a time, recognise their meanings, then practise your recall. No timer.</p><p class="hint" id="learn-progress"></p></div><button class="primary" type="button" id="learn-start">Open learning unit</button></section><h2 class="play-heading">Play &amp; compete</h2><div class="setup-grid"><div>
   <section class="section" aria-labelledby="teams-title"><div class="section-title"><span class="step" aria-hidden="true">01</span><h2 id="teams-title">${SENIOR?'Players & teams':'Solo or squad?'}</h2></div><div class="team-count" role="group" aria-label="Players and teams">${[1,2,3,4].map(n=>`<button class="choice" type="button" data-count="${n}" aria-pressed="${setup.count===n}">${n===1?'Solo':n+' Teams'}</button>`).join('')}</div><div class="team-inputs ${isSolo()?'solo-input':''}">${Array.from({length:setup.count},(_,i)=>`<div class="team-entry team-color-${i}"><label for="team-${i}"><span class="team-avatar" aria-hidden="true">${TEAM_ICONS[i]}</span> ${isSolo()?'Player name':'Team '+(i+1)}</label><input id="team-${i}" name="team-${i}" maxlength="24" value="${escapeHTML(isSolo()?setup.soloName:setup.names[i])}" autocomplete="off" required></div>`).join('')}</div></section>
   <section class="section" aria-labelledby="topics-title"><div class="section-title"><span class="step" aria-hidden="true">02</span><h2 id="topics-title">${SENIOR?'Choose your topics':'Choose your mission'}</h2></div>
   ${MISSIONS.map(({id,title,sub,icon,groups})=>`<label class="topic topic-${id}"><span class="topic-icon" aria-hidden="true">${icon}</span><input type="checkbox" name="topic" value="${id}" ${setup.topics.includes(id)?'checked':''}><span class="topic-copy"><strong lang="en">${escapeHTML(title)}</strong><span>${escapeHTML(sub)}</span></span><span class="word-count">${VOCAB.filter(w=>wordInGroups(w,groups)).length} words</span></label>`).join('')}
@@ -54,6 +54,7 @@ function renderSetup(){
   $('#setup-form').addEventListener('change',e=>{if(e.target.id==='rounds'&&e.target.value==='custom')$('#custom-rounds').value=setup.rounds;readSetup();updateSetupSummary();});
   $('#custom-rounds').addEventListener('input',()=>{readSetup();updateSetupSummary();});
   $('#setup-form').addEventListener('submit',e=>{e.preventDefault();readSetup();if(!selectedWords().length){$('#setup-error').textContent='Choose at least one mission.';return;}if(new Set(playerNames().map(normalise)).size!==setup.count){$('#setup-error').textContent='Give each team a different name.';return;}startGame();});
+  $('#learn-start').onclick=()=>{readSetup();renderLearningSetup();};
   $('#flashcards-start').onclick=()=>{readSetup();startFlashcards(selectedWords());};
   if($('#mistakes-start'))$('#mistakes-start').onclick=()=>{readSetup();startFlashcards(VOCAB.filter(w=>pendingMistakes.has(w.id)));};
   updateSetupSummary();
@@ -69,6 +70,7 @@ function readSetup(){
   if(Number.isInteger(rounds)&&rounds>=1&&rounds<=1000)setup.rounds=rounds;
 }
 function updateSetupSummary(){
+  $('#learn-progress').textContent=`${learningCount(selectedWords())} / ${selectedWords().length} selected words learned on this device. Choose your topics below.`;
   $('#selection-count').textContent=`${selectedWords().length} words selected`;
   $('#direction-field').hidden=setup.mode==='pairs';
   $('#custom-rounds-field').hidden=!setup.customRounds;
@@ -266,4 +268,5 @@ document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.alt
 $('#vocab-total').textContent=`${VOCAB.length} words · ${Object.keys(MODES).length} game modes`;
 $('#word-log-intro').textContent=`All ${VOCAB.length} words for English ${GRADE}. ${VOCAB_NOTE}`;
 loadMistakes();
-renderSetup();
+loadLearning();
+if(new URLSearchParams(location.search).get('activity')==='learn')renderLearningSetup();else renderSetup();
