@@ -16,7 +16,7 @@ const answerVariants = (word, lang) => {
   const parts=word.de.split(';').flatMap(s => [s,...s.split(' / ')]);
   return [...new Set([...parts,...word.aliases.filter(s=>!EN_ALIAS_WORDS.has(normalise(s)))].map(normalise))];
 };
-let setup = {count:2, soloName:'Player 1', names:['Team 1','Team 2','Team 3','Team 4'],topics:MISSIONS.map(m=>m.id),mode:'mix',direction:'mixed',seconds:25,rounds:5,customRounds:false};
+let setup = {count:2, soloName:'Player 1', names:['Team 1','Team 2','Team 3','Team 4'],topics:MISSIONS.map(m=>m.id),mode:'mix',direction:'mixed',seconds:25,rounds:5,customRounds:true};
 let game = null, timer = null;
 function isSolo(){return setup.count===1;}
 function playerNames(){return isSolo()?[setup.soloName]:setup.names.slice(0,setup.count);}

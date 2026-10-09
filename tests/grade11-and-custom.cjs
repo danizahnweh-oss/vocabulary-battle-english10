@@ -6,6 +6,7 @@ const base=process.env.VOCAB_BASE_URL||'http://127.0.0.1:8765';
  async function quit(){await page.locator('#quit').click();await page.locator('#confirm-quit').click();}
  for(const grade of [7,10,11]){
   await page.goto(`${base}/${grade}/`);assert.equal(await page.locator('#mode').inputValue(),'mix');assert.equal(await page.locator('#direction').inputValue(),'mixed');
+  assert.equal(await page.locator('#rounds').inputValue(),'custom');assert.equal(await page.locator('#custom-rounds').inputValue(),'5');assert.equal(await page.locator('#custom-rounds').isVisible(),true);
   assert.equal(await page.evaluate(()=>selectedWords().length===VOCAB.length),true);
   assert.deepEqual(await page.locator('#rounds option').evaluateAll(options=>options.map(o=>o.value)),['3','5','10','custom']);
   await page.getByRole('button',{name:'Solo',exact:true}).click();await page.locator('#rounds').selectOption('custom');await page.locator('#custom-rounds').fill('7');
